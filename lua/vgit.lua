@@ -219,7 +219,7 @@ local generate_tracked_hunk_signs = debounce_trailing(
     end
     local current_lines = buffer.get_lines(buf)
     buffer.store.set(buf, 'temp_lines', current_lines)
-    if vim.diff then
+    if vim.diff and controller_store.get('use_internal_diff') then
       int_hunk_generation(buf, original_lines, current_lines)
     else
       ext_hunk_generation(buf, original_lines, current_lines)

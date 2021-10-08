@@ -53,11 +53,17 @@ local attach_blames_autocmd = function(buf)
     'CursorMoved',
     string.format(':lua _G.package.loaded.vgit._unblame_line(%s)', buf)
   )
+  autocmd.buf.on(
+    buf,
+    'InsertEnter',
+    string.format(':lua _G.package.loaded.vgit._unblame_line(%s)', buf)
+  )
 end
 
 local detach_blames_autocmd = function(buf)
   autocmd.buf.off(buf, 'CursorHold')
   autocmd.buf.off(buf, 'CursorMoved')
+  autocmd.buf.off(buf, 'InsertEnter')
 end
 
 local get_hunk_calculator = function()

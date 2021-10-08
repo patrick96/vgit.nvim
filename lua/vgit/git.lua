@@ -742,6 +742,25 @@ M.tracked_remote_filename = wrap(function(filename, callback)
   job:start()
 end, 2)
 
+M.is_in_remote = wrap(function(filename, callback)
+  local err = {}
+  local job = Job:new({
+    command = 'git',
+    args = {
+      'cat-file',
+      '-e',
+      string.format('%s:%s', M.get_diff_base(), filename),
+    },
+    on_stderr = function(_, data, _)
+      err[#err + 1] = data
+    end,
+    on_exit = function()
+      callback(vim.tbl_isempty(err))
+    end,
+  })
+  job:start()
+end, 2)
+
 M.ls_changed = wrap(function(callback)
   local err = {}
   local result = {}

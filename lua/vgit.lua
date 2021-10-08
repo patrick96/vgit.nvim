@@ -1319,6 +1319,14 @@ M.buffer_history_preview = void(function()
   if buffer.store.get(buf, 'untracked') then
     return
   end
+  local is_file_in_remote = git.is_in_remote(
+    buffer.store.get(buf, 'tracked_filename')
+  )
+  scheduler()
+  if not is_file_in_remote then
+    logger.info('File does not exist in remote')
+    return
+  end
   local diff_preference = controller_store.get('diff_preference')
   local calculate_change = (
       diff_preference == 'horizontal' and change.horizontal

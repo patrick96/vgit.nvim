@@ -1,5 +1,4 @@
 local Component = require('vgit.Component')
-local Interface = require('vgit.Interface')
 local buffer = require('vgit.buffer')
 local AppBarDecorator = require('vgit.decorators.AppBarDecorator')
 
@@ -102,45 +101,43 @@ function TableComponent:new(options)
       },
       paint_count = 0,
     },
-    config = Interface
-      :new({
-        filetype = '',
-        header = {},
-        column_spacing = 10,
-        max_column_len = 40,
-        border = {
-          enabled = false,
-          title = '',
-          footer = '',
-          hl = 'FloatBorder',
-          chars = { '', '', '', '', '', '', '', '' },
-        },
-        buf_options = {
-          ['modifiable'] = false,
-          ['buflisted'] = false,
-          ['bufhidden'] = 'wipe',
-        },
-        win_options = {
-          ['wrap'] = false,
-          ['number'] = false,
-          ['winhl'] = 'Normal:',
-          ['cursorline'] = false,
-          ['cursorbind'] = false,
-          ['scrollbind'] = false,
-          ['signcolumn'] = 'auto',
-        },
-        window_props = {
-          style = 'minimal',
-          relative = 'editor',
-          height = height,
-          width = width,
-          row = 1,
-          col = 0,
-          focusable = true,
-        },
-        static = false,
-      })
-      :assign(options),
+    config = vim.tbl_deep_extend('force', {
+      filetype = '',
+      header = {},
+      column_spacing = 10,
+      max_column_len = 40,
+      border = {
+        enabled = false,
+        title = '',
+        footer = '',
+        hl = 'FloatBorder',
+        chars = { '', '', '', '', '', '', '', '' },
+      },
+      buf_options = {
+        ['modifiable'] = false,
+        ['buflisted'] = false,
+        ['bufhidden'] = 'wipe',
+      },
+      win_options = {
+        ['wrap'] = false,
+        ['number'] = false,
+        ['winhl'] = 'Normal:',
+        ['cursorline'] = false,
+        ['cursorbind'] = false,
+        ['scrollbind'] = false,
+        ['signcolumn'] = 'auto',
+      },
+      window_props = {
+        style = 'minimal',
+        relative = 'editor',
+        height = height,
+        width = width,
+        row = 1,
+        col = 0,
+        focusable = true,
+      },
+      static = false,
+    }, options),
   }, TableComponent)
 end
 
@@ -161,7 +158,7 @@ function TableComponent:get_paddings()
 end
 
 function TableComponent:get_column_spacing()
-  return self.config:get('column_spacing')
+  return self.config.column_spacing
 end
 
 function TableComponent:get_column_ranges()
@@ -201,9 +198,9 @@ function TableComponent:set_lines(lines, force)
   assert(type(lines) == 'table', 'type error :: expected table')
   self:increment_paint_count()
   self:clear_timers()
-  local header = self.config:get('header')
-  local column_spacing = self.config:get('column_spacing')
-  local max_column_len = self.config:get('max_column_len')
+  local header = self.config.header
+  local column_spacing = self.config.column_spacing
+  local max_column_len = self.config.max_column_len
   local paddings = make_paddings(lines, header, column_spacing, max_column_len)
   local column_header = make_heading(
     paddings,
@@ -222,10 +219,10 @@ function TableComponent:mount()
   if self:is_mounted() then
     return self
   end
-  local buf_options = self.config:get('buf_options')
-  local border_config = self.config:get('border')
-  local window_props = self.config:get('window_props')
-  local win_options = self.config:get('win_options')
+  local buf_options = self.config.buf_options
+  local border_config = self.config.border
+  local window_props = self.config.window_props
+  local win_options = self.config.win_options
   self:set_buf(vim.api.nvim_create_buf(false, true))
   local buf = self:get_buf()
   buffer.assign_options(buf, buf_options)

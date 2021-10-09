@@ -1,5 +1,4 @@
 local Component = require('vgit.Component')
-local Interface = require('vgit.Interface')
 local icons = require('vgit.icons')
 local buffer = require('vgit.buffer')
 local VirtualLineNrDecorator = require('vgit.decorators.VirtualLineNrDecorator')
@@ -33,48 +32,46 @@ function CodeComponent:new(options)
       },
       paint_count = 0,
     },
-    config = Interface
-      :new({
-        filetype = '',
-        header = {
-          enabled = true,
-        },
-        border = {
-          enabled = false,
-          hl = 'FloatBorder',
-          chars = { '', '', '', '', '', '', '', '' },
-        },
-        buf_options = {
-          ['modifiable'] = false,
-          ['buflisted'] = false,
-          ['bufhidden'] = 'wipe',
-        },
-        win_options = {
-          ['wrap'] = false,
-          ['number'] = false,
-          ['winhl'] = 'Normal:',
-          ['cursorline'] = false,
-          ['cursorbind'] = false,
-          ['scrollbind'] = false,
-          ['signcolumn'] = 'auto',
-        },
-        window_props = {
-          style = 'minimal',
-          relative = 'editor',
-          height = height,
-          width = width,
-          row = 1,
-          col = 0,
-          focusable = true,
-          zindex = 60,
-        },
-        virtual_line_nr = {
-          enabled = false,
-          width = render_store.get('preview').virtual_line_nr_width,
-        },
-        static = false,
-      })
-      :assign(options),
+    config = vim.tbl_deep_extend('force', {
+      filetype = '',
+      header = {
+        enabled = true,
+      },
+      border = {
+        enabled = false,
+        hl = 'FloatBorder',
+        chars = { '', '', '', '', '', '', '', '' },
+      },
+      buf_options = {
+        ['modifiable'] = false,
+        ['buflisted'] = false,
+        ['bufhidden'] = 'wipe',
+      },
+      win_options = {
+        ['wrap'] = false,
+        ['number'] = false,
+        ['winhl'] = 'Normal:',
+        ['cursorline'] = false,
+        ['cursorbind'] = false,
+        ['scrollbind'] = false,
+        ['signcolumn'] = 'auto',
+      },
+      window_props = {
+        style = 'minimal',
+        relative = 'editor',
+        height = height,
+        width = width,
+        row = 1,
+        col = 0,
+        focusable = true,
+        zindex = 60,
+      },
+      virtual_line_nr = {
+        enabled = false,
+        width = render_store.get('preview').virtual_line_nr_width,
+      },
+      static = false,
+    }, options),
   }, CodeComponent)
 end
 
@@ -91,7 +88,7 @@ function CodeComponent:get_header()
 end
 
 function CodeComponent:is_header_enabled()
-  return self.config:get('header').enabled
+  return self.config.header.enabled
 end
 
 function CodeComponent:set_header(header)
@@ -153,15 +150,15 @@ function CodeComponent:mount()
   if self:is_mounted() then
     return self
   end
-  local buf_options = self.config:get('buf_options')
-  local window_props = self.config:get('window_props')
-  local win_options = self.config:get('win_options')
+  local buf_options = self.config.buf_options
+  local window_props = self.config.window_props
+  local win_options = self.config.win_options
   self:set_buf(vim.api.nvim_create_buf(false, true))
   local buf = self:get_buf()
   buffer.assign_options(buf, buf_options)
   local win_ids = {}
   if self:is_virtual_line_nr_enabled() then
-    local virtual_line_nr_config = self.config:get('virtual_line_nr')
+    local virtual_line_nr_config = self.config.virtual_line_nr
     if self:is_header_enabled() then
       self:set_header(AppBarDecorator:new(window_props, buf):mount())
     end
@@ -179,7 +176,7 @@ function CodeComponent:mount()
     end
   end
   if self:is_border_enabled() then
-    local border_config = self.config:get('border')
+    local border_config = self.config.border
     window_props.border = self:make_border(border_config)
   end
   if self:is_header_enabled() then
@@ -200,7 +197,7 @@ function CodeComponent:mount()
     )
   )
   if self:is_virtual_line_nr_enabled() then
-    local virtual_line_nr_config = self.config:get('virtual_line_nr')
+    local virtual_line_nr_config = self.config.virtual_line_nr
     window_props.width = window_props.width + virtual_line_nr_config.width
     window_props.col = window_props.col - virtual_line_nr_config.width
   end
@@ -230,7 +227,7 @@ function CodeComponent:unmount()
       pcall(vim.api.nvim_win_close, virtual_line_nr_win_id, true)
     end
   end
-  if self.config:get('header').enabled then
+  if self.config.header.enabled then
     local header_win_id = self:get_header_win_id()
     if vim.api.nvim_win_is_valid(header_win_id) then
       pcall(vim.api.nvim_win_close, header_win_id, true)

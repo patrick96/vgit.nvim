@@ -1,14 +1,12 @@
-local Interface = require('vgit.Interface')
-
 local M = {}
 
-M.state = Interface:new({
+M.state = {
   debug = false,
   debug_logs = {},
-})
+}
 
 M.setup = function(config)
-  M.state:assign(config)
+  vim.tbl_deep_extend('force', M.state, config or {})
 end
 
 M.error = function(msg)
@@ -24,7 +22,7 @@ M.warn = function(msg)
 end
 
 M.debug = function(msg, trace)
-  if not M.state:get('debug') then
+  if not M.state.debug then
     return
   end
   local new_msg = ''
@@ -40,7 +38,7 @@ M.debug = function(msg, trace)
   else
     new_msg = msg
   end
-  local debug_logs = M.state:get('debug_logs')
+  local debug_logs = M.state.debug_logs
   local log = ''
   if trace then
     log = string.format('VGit[%s]: %s\n%s', os.date('%H:%M:%S'), new_msg, trace)

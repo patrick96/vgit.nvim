@@ -612,7 +612,7 @@ M._blame_line = debounce_trailing(
     if
       vim.api.nvim_win_get_cursor(vim.api.nvim_get_current_win())[1] == lnum
     then
-      renderer.render_blame_line(buf, blame, lnum, git.state:get('config'))
+      renderer.render_blame_line(buf, blame, lnum, git.state.config)
       scheduler()
       if not buffer.store.contains(buf) then
         return
@@ -1147,8 +1147,8 @@ M.apply_highlights = function()
 end
 
 M.show_debug_logs = function()
-  if logger.state:get('debug') then
-    local debug_logs = logger.state:get('debug_logs')
+  if logger.state.debug then
+    local debug_logs = logger.state.debug_logs
     for i = 1, #debug_logs do
       local log = debug_logs[i]
       logger.error(log)
@@ -1199,7 +1199,7 @@ M.set_diff_base = void(function(diff_base)
   end
   local data = buffer.store.get_data()
   for buf, bcache in pairs(data) do
-    local hunks_err, hunks = git.remote_hunks(bcache:get('tracked_filename'))
+    local hunks_err, hunks = git.remote_hunks(bcache.tracked_filename)
     scheduler()
     if hunks_err then
       logger.debug(hunks_err, debug.traceback())
@@ -1725,7 +1725,7 @@ M.setup = function(config)
   highlight.setup(config)
   sign.setup(config)
   logger.setup(config)
-  git.setup(config)
+  git.setup()
   key_mapper.setup(config)
   autocmd.on('BufWinEnter', ':lua _G.package.loaded.vgit._buf_attach()')
   autocmd.on('BufWinLeave', ':lua _G.package.loaded.vgit._buf_detach()')

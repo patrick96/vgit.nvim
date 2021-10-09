@@ -1,7 +1,6 @@
 local utils = require('vgit.utils')
 local Job = require('vgit.Job')
 local Hunk = require('vgit.Hunk')
-local Interface = require('vgit.Interface')
 local wrap = require('plenary.async.async').wrap
 local void = require('plenary.async.async').void
 
@@ -12,17 +11,17 @@ M.constants = utils.readonly({
   empty_tree_hash = '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
 })
 
-M.state = Interface:new({
+M.state = {
   diff_base = 'HEAD',
   config = {},
-})
+}
 
 M.get_diff_base = function()
-  return M.state:get('diff_base')
+  return M.state.diff_base
 end
 
 M.set_diff_base = function(diff_base)
-  M.state:set('diff_base', diff_base)
+  M.state.diff_base = diff_base
 end
 
 M.is_commit_valid = wrap(function(commit, callback)
@@ -132,11 +131,10 @@ M.create_blame = function(info)
 end
 
 -- TODO: This needs to be removed.
-M.setup = void(function(config)
-  M.state:assign(config)
+M.setup = void(function()
   local err, git_config = M.config()
   if not err then
-    M.state:set('config', git_config)
+    M.state.config = git_config
   end
 end)
 
@@ -407,7 +405,7 @@ M.remote_hunks = wrap(function(filename, parent_hash, commit_hash, callback)
     string.format('--diff-algorithm=%s', M.constants.diff_algorithm),
     '--patch-with-raw',
     '--unified=0',
-    M.state:get('diff_base'),
+    M.state.diff_base,
     '--',
     filename,
   }

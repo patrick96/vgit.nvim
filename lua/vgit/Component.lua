@@ -10,11 +10,10 @@ local buffer = require('vgit.buffer')
 local VirtualLineNrDecorator = require('vgit.decorators.VirtualLineNrDecorator')
 local void = require('plenary.async.async').void
 local scheduler = require('plenary.async.util').scheduler
-local Interface = require('vgit.Interface')
 
 local Component = Object:extend()
 
-Component.state = Interface:new({
+Component.state = {
   loading = {
     frame_rate = 60,
     frames = {
@@ -26,10 +25,10 @@ Component.state = Interface:new({
     },
   },
   error = '✖✖✖',
-})
+}
 
 function Component:setup(config)
-  Component.state:assign(config)
+  vim.tbl_deep_extend('force', Component.state, config)
 end
 
 function Component:new(options)
@@ -57,50 +56,48 @@ function Component:new(options)
       },
       paint_count = 0,
     },
-    config = Interface
-      :new({
-        filetype = '',
-        border = {
-          enabled = false,
-          hl = 'FloatBorder',
-          chars = { '', '', '', '', '', '', '', '' },
-        },
-        buf_options = {
-          ['modifiable'] = false,
-          ['buflisted'] = false,
-          ['bufhidden'] = 'wipe',
-        },
-        win_options = {
-          ['wrap'] = false,
-          ['number'] = false,
-          ['winhl'] = 'Normal:',
-          ['cursorline'] = false,
-          ['cursorbind'] = false,
-          ['scrollbind'] = false,
-          ['signcolumn'] = 'auto',
-        },
-        window_props = {
-          style = 'minimal',
-          relative = 'editor',
-          height = height,
-          width = width,
-          row = 1,
-          col = 0,
-          focusable = true,
-          zindex = 50,
-        },
-        virtual_line_nr = {
-          enabled = false,
-          width = render_store.get('preview').virtual_line_nr_width,
-        },
-        static = false,
-      })
-      :assign(options),
+    config = vim.tbl_deep_extend('force', {
+      filetype = '',
+      border = {
+        enabled = false,
+        hl = 'FloatBorder',
+        chars = { '', '', '', '', '', '', '', '' },
+      },
+      buf_options = {
+        ['modifiable'] = false,
+        ['buflisted'] = false,
+        ['bufhidden'] = 'wipe',
+      },
+      win_options = {
+        ['wrap'] = false,
+        ['number'] = false,
+        ['winhl'] = 'Normal:',
+        ['cursorline'] = false,
+        ['cursorbind'] = false,
+        ['scrollbind'] = false,
+        ['signcolumn'] = 'auto',
+      },
+      window_props = {
+        style = 'minimal',
+        relative = 'editor',
+        height = height,
+        width = width,
+        row = 1,
+        col = 0,
+        focusable = true,
+        zindex = 50,
+      },
+      virtual_line_nr = {
+        enabled = false,
+        width = render_store.get('preview').virtual_line_nr_width,
+      },
+      static = false,
+    }, options),
   }, Component)
 end
 
 function Component:is_virtual_line_nr_enabled()
-  return self.config:get('virtual_line_nr').enabled
+  return self.config.virtual_line_nr.enabled
 end
 
 function Component:has_virtual_line_nr()
@@ -108,15 +105,15 @@ function Component:has_virtual_line_nr()
 end
 
 function Component:is_border_enabled()
-  return self.config:get('border').enabled
+  return self.config.border.enabled
 end
 
 function Component:is_static()
-  return self.config:get('static')
+  return self.config.static
 end
 
 function Component:is_hover()
-  return self.config:get('window_props').relative == 'cursor'
+  return self.config.window_props.relative == 'cursor'
 end
 
 function Component:is_focused()
@@ -263,7 +260,7 @@ function Component:set_width(value)
 end
 
 function Component:add_syntax_highlights()
-  local filetype = self.config:get('filetype')
+  local filetype = self.config.filetype
   if not filetype or filetype == '' then
     return self
   end
@@ -313,7 +310,7 @@ end
 
 function Component:set_filetype(filetype)
   assert(type(filetype) == 'string', 'type error :: expected string')
-  self.config:set('filetype', filetype)
+  self.config.filetype = filetype
   local buf = self:get_buf()
   self:clear_syntax_highlights()
   self:add_syntax_highlights()
@@ -363,8 +360,8 @@ function Component:set_virtual_line_nr_lines(lines, hls)
   virtual_line_nr:unmount()
   self:set_virtual_line_nr(
     VirtualLineNrDecorator:new(
-      self.config:get('virtual_line_nr'),
-      self.config:get('window_props'),
+      self.config.virtual_line_nr,
+      self.config.window_props,
       self:get_buf()
     )
   )
@@ -424,7 +421,7 @@ function Component:set_loading(value, force)
   if value then
     self:set_cached_cursor(vim.api.nvim_win_get_cursor(self:get_win_id()))
     self.state.loading = value
-    local animation_configuration = Component.state:get('loading')
+    local animation_configuration = Component.state.loading
     self:set_centered_animated_text(
       animation_configuration.frame_rate,
       animation_configuration.frames,
@@ -434,7 +431,7 @@ function Component:set_loading(value, force)
     self:add_syntax_highlights()
     self.state.loading = value
     buffer.set_lines(self:get_buf(), self:get_cached_lines())
-    self:set_win_option('cursorline', self.config:get('win_options').cursorline)
+    self:set_win_option('cursorline', self.config.win_options.cursorline)
     navigation.set_cursor(self:get_win_id(), self:get_cached_cursor())
     self:set_cached_lines({})
     self.state.cursor = nil
@@ -453,12 +450,12 @@ function Component:set_error(value, force)
   end
   if value then
     self.state.error = value
-    self:set_centered_text(Component.state:get('error'))
+    self:set_centered_text(Component.state.error)
   else
     self:add_syntax_highlights()
     self.state.error = value
     buffer.set_lines(self:get_buf(), self:get_cached_lines())
-    self:set_win_option('cursorline', self.config:get('win_options').cursorline)
+    self:set_win_option('cursorline', self.config.win_options.cursorline)
     self:set_cached_lines({})
   end
   return self

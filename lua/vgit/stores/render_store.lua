@@ -1,11 +1,10 @@
 local utils = require('vgit.utils')
-local Interface = require('vgit.Interface')
 
 local M = {}
 
 local virtual_line_nr_width = 6
 
-M.state = Interface:new({
+M.state = {
   layout = require('vgit.layouts.default'),
   preview = {
     indicator_hl = 'VGitIndicator',
@@ -73,19 +72,22 @@ M.state = Interface:new({
       return string.format(' %s', info)
     end,
   },
-})
+}
 
 M.setup = function(config)
-  config = config or {}
-  M.state:assign(config.render)
+  vim.tbl_deep_extend(
+    'force',
+    M.state,
+    config and config.render and config.render or {}
+  )
 end
 
 M.get = function(key)
-  return M.state:get(key)
+  return M.state[key]
 end
 
 M.set = function(key, value)
-  return M.state:set(key, value)
+  M.state[key] = value
 end
 
 return M

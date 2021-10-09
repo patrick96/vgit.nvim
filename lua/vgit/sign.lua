@@ -1,6 +1,5 @@
 local utils = require('vgit.utils')
 local render_store = require('vgit.stores.render_store')
-local Interface = require('vgit.Interface')
 
 local M = {}
 
@@ -8,7 +7,7 @@ M.constants = utils.readonly({
   ns_id = 'tanvirtin/vgit.nvim/hunk/signs',
 })
 
-M.state = Interface:new({
+M.state = {
   VGitViewSignAdd = {
     name = render_store.get('preview').sign.hls.add,
     line_hl = render_store.get('preview').sign.hls.add,
@@ -49,11 +48,11 @@ M.state = Interface:new({
     line_hl = nil,
     text = '┃',
   },
-})
+}
 
 M.setup = function(config)
-  M.state:assign((config and config.signs) or config)
-  for _, action in pairs(M.state.data) do
+  vim.tbl_deep_extend('force', M.state, (config and config.signs) or {})
+  for _, action in pairs(M.state) do
     M.define(action)
   end
 end

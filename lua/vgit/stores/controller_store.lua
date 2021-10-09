@@ -1,8 +1,6 @@
-local Interface = require('vgit.Interface')
-
 local M = {}
 
-M.state = Interface:new({
+M.state = {
   config = {},
   disabled = false,
   hunks_enabled = true,
@@ -15,19 +13,18 @@ M.state = Interface:new({
   predict_hunk_max_lines = 50000,
   blame_line_throttle_ms = 150,
   use_internal_diff = false,
-})
+}
 
 M.setup = function(config)
-  config = config or {}
-  M.state:assign(config.controller)
+  vim.tbl_deep_extend('force', M.state, config and config.controller or {})
 end
 
 M.get = function(key)
-  return M.state:get(key)
+  return M.state[key]
 end
 
 M.set = function(key, value)
-  return M.state:set(key, value)
+  M.state[key] = value
 end
 
 return M

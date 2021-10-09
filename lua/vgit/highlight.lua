@@ -1,8 +1,6 @@
-local Interface = require('vgit.Interface')
-
 local M = {}
 
-M.state = Interface:new(require('vgit.themes.monokai'))
+M.state = require('vgit.themes.monokai')
 
 M.exists = function(name)
   return pcall(vim.api.nvim_get_hl_by_name, name, true)
@@ -25,8 +23,8 @@ M.create_theme = function(hls)
 end
 
 M.setup = function(config, force)
-  M.state:assign((config and config.hls) or config)
-  for hl, color in pairs(M.state.data) do
+  vim.tbl_deep_extend('force', M.state, config and config.hls or {})
+  for hl, color in pairs(M.state) do
     if force or not M.exists(hl) then
       M.create(hl, color)
     end

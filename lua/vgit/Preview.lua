@@ -446,10 +446,7 @@ function Preview:mount()
   for _, component in pairs(self.components) do
     component:on(
       'BufWinLeave',
-      string.format(
-        ':lua require("vgit").renderer.hide_windows(%s)',
-        vim.inspect(win_ids)
-      ),
+      string.format('renderer.hide_windows(%s)', vim.inspect(win_ids)),
       { once = true }
     )
   end
@@ -464,10 +461,7 @@ function Preview:mount()
       autocmd.buf.on(
         buf,
         event,
-        string.format(
-          ':lua _G.package.loaded.vgit.renderer.hide_windows(%s)',
-          vim.inspect(win_ids)
-        ),
+        string.format('renderer.hide_windows(%s)', vim.inspect(win_ids)),
         { once = true }
       )
     end

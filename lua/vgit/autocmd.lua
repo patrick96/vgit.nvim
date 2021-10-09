@@ -17,7 +17,7 @@ M.on = function(cmd, handler, options)
   local nested = (options and options.nested) or false
   vim.api.nvim_exec(
     string.format(
-      'au%s %s %s * %s %s %s',
+      'au%s %s %s * %s %s :lua _G.package.loaded.vgit.%s',
       override and '!' or '',
       M.namespace,
       cmd,
@@ -35,7 +35,7 @@ M.buf.on = function(buf, cmd, handler, options)
   local nested = (options and options.nested) or false
   vim.api.nvim_exec(
     string.format(
-      'au%s %s %s <buffer=%s> %s %s %s',
+      'au%s %s %s <buffer=%s> %s %s :lua _G.package.loaded.vgit.%s',
       override and '!' or '',
       M.namespace,
       cmd,

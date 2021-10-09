@@ -202,10 +202,7 @@ function CodeComponent:mount()
     window_props.col = window_props.col - virtual_line_nr_config.width
   end
   win_ids[#win_ids + 1] = win_id
-  self:on(
-    'BufWinLeave',
-    string.format(':lua require("vgit").renderer.hide_windows(%s)', win_ids)
-  )
+  self:on('BufWinLeave', string.format('renderer.hide_windows(%s)', win_ids))
   self:add_syntax_highlights()
   self:set_mounted(true)
   return self

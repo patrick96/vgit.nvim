@@ -44,10 +44,7 @@ function VirtualLineNrDecorator:mount()
   autocmd.buf.on(
     self.content_buf,
     'WinClosed',
-    string.format(
-      ':lua _G.package.loaded.vgit.renderer.hide_windows({ %s })',
-      self.win_id
-    ),
+    string.format('renderer.hide_windows({ %s })', self.win_id),
     { once = true }
   )
   return self

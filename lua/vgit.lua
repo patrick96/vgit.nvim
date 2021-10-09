@@ -43,21 +43,9 @@ local store_buf =
   end
 
 local attach_blames_autocmd = function(buf)
-  autocmd.buf.on(
-    buf,
-    'CursorHold',
-    string.format(':lua _G.package.loaded.vgit._blame_line(%s)', buf)
-  )
-  autocmd.buf.on(
-    buf,
-    'CursorMoved',
-    string.format(':lua _G.package.loaded.vgit._unblame_line(%s)', buf)
-  )
-  autocmd.buf.on(
-    buf,
-    'InsertEnter',
-    string.format(':lua _G.package.loaded.vgit._unblame_line(%s)', buf)
-  )
+  autocmd.buf.on(buf, 'CursorHold', string.format('_blame_line(%s)', buf))
+  autocmd.buf.on(buf, 'CursorMoved', string.format('_unblame_line(%s)', buf))
+  autocmd.buf.on(buf, 'InsertEnter', string.format('_unblame_line(%s)', buf))
 end
 
 local detach_blames_autocmd = function(buf)
@@ -1727,10 +1715,10 @@ M.setup = function(config)
   logger.setup(config)
   git.setup()
   key_mapper.setup(config)
-  autocmd.on('BufWinEnter', ':lua _G.package.loaded.vgit._buf_attach()')
-  autocmd.on('BufWinLeave', ':lua _G.package.loaded.vgit._buf_detach()')
-  autocmd.on('BufWritePost', ':lua _G.package.loaded.vgit._buf_update()')
-  autocmd.on('WinEnter', ':lua _G.package.loaded.vgit._keep_focused()')
+  autocmd.on('BufWinEnter', '_buf_attach()')
+  autocmd.on('BufWinLeave', '_buf_detach()')
+  autocmd.on('BufWritePost', '_buf_update()')
+  autocmd.on('WinEnter', '_keep_focused()')
   vim.cmd(
     string.format(
       'command! -nargs=* -range %s %s',

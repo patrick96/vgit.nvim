@@ -13,7 +13,7 @@ M.add_keymap = function(buf, key, action)
     buf,
     'n',
     key,
-    string.format(':lua require("vgit").%s<CR>', action),
+    string.format(':lua _G.package.loaded.vgit.%s<CR>', action),
     {
       silent = true,
       noremap = true,

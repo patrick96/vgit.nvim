@@ -6,7 +6,7 @@ M.state = {
 }
 
 M.setup = function(config)
-  vim.tbl_deep_extend('force', M.state, config or {})
+  vim.tbl_deep_extend('force', M.state, config and config.logger or {})
 end
 
 M.error = function(msg)

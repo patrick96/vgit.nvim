@@ -12,9 +12,11 @@ describe('setup', function()
     'should override state highlights with highlights specified through the config',
     function()
       logger.setup({
-        debug = true,
+        logger = {
+          debug = true,
+        },
       })
-      eq(logger.state:get('debug'), true)
+      eq(logger.state.debug, true)
     end
   )
 end)

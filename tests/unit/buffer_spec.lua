@@ -165,7 +165,7 @@ describe('add_keymap', function()
       buf,
       'n',
       '<enter>',
-      ':lua require("vgit")._rerender_history()<CR>',
+      ':lua _G.package.loaded.vgit._rerender_history()<CR>',
       {
         silent = true,
         noremap = true,

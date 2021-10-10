@@ -10,12 +10,14 @@ describe('highlight:', function()
       'should override state highlights with highlights specified through the config',
       function()
         highlight.setup({
-          VGitSignAdd = {
-            fg = 'red',
-            bg = nil,
+          hls = {
+            VGitSignAdd = {
+              fg = 'red',
+              bg = nil,
+            },
           },
         })
-        eq(highlight.state.data.VGitSignAdd, {
+        eq(highlight.state.VGitSignAdd, {
           fg = 'red',
           bg = nil,
         })

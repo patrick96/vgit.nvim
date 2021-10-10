@@ -121,11 +121,7 @@ Layout definitions can be found in `lua/vgit/layouts/`, feel free to open a pull
 | project_diff_preview | Opens a preview listing all the files that have been changed |
 | hunk_down | Navigate downward through a hunk, this works on any view with diff highlights |
 | hunk_up | Navigate upwards through a hunk, this works on any view with diff highlights |
-| get_diff_base | Returns the current diff base that all diff and hunks are being compared for all buffers |
 | get_diff_preference | Returns the current diff preference of the diff, the value will either be "horizontal" or "vertical" |
-| get_diff_strategy | Returns the current diff strategy used to compute hunk signs and buffer preview, the value will either be "remote" or "index" |
-| set_diff_base | Sets the current diff base to a different commit, going forward all future hunks and diffs for a given buffer will be against this commit |
-| set_diff_strategy | Sets the diff strategy that will be used to show hunk signs and buffer preview, the value can only be "remote" or "index" |
 | show_debug_logs | Shows all errors that has occured during program execution |
 
 ## Advanced Setup

@@ -45,7 +45,6 @@ configuration:
         controller = {
             hunks_enabled = true,
             blames_enabled = true,
-            diff_strategy = 'index',
             diff_preference = 'horizontal',
             predict_hunk_signs = true,
             predict_hunk_throttle_ms = 300,
@@ -142,9 +141,7 @@ buffer_hunk_preview()                              *vgit.buffer_hunk_preview()*
                 current buffer. If the command is executed when the cursor is
                 on top of a hunk sign, the preview will focus on that hunk
                 when opened. Users can use the navigation commands to travel
-                through the hunks. Please see |vgit-navigation|. This preview
-                is also dependent on the the diff strategy and diff
-                base, please refer to |vgit-diff-base|.
+                through the hunks. Please see |vgit-navigation|. 
 
 buffer_diff_preview()                            *vgit.buffer_diff_preview()*
                 Opens a diff preview showing the diff of the
@@ -152,9 +149,7 @@ buffer_diff_preview()                            *vgit.buffer_diff_preview()*
                 If the command is executed when the cursor is
                 on top of a hunk sign, the preview will focus on that hunk
                 when opened. Users can use the navigation commands to travel
-                through the hunks. Please see |vgit-navigation|. This preview
-                is also dependent on the the diff strategy and diff
-                base, please refer to |vgit-diff-base|.
+                through the hunks. Please see |vgit-navigation|. 
 
 buffer_history_preview()                     *vgit.buffer_history_preview()*
                 Opens a diff preview along with a table of logs, enabling
@@ -236,59 +231,6 @@ show_debug_logs()                                       *vgit.show_debug_logs()*
                 If the "debug" flag is set to true using *vgit.setup* then
                 executing this command will show all the logs that VGit is
                 keeping track of.
-
-get_diff_preference()                               *vgit.get_diff_preference()*
-                Returns the current diff preference, this value will either be
-                "remote" or "index".
-
-get_diff_base()                                           *vgit.get_diff_base()*
-                Returns the current diff base. This value is not very useful
-                if the diff preference is not "remote".
-
-get_diff_strategy()                                   *vgit.get_diff_strategy()*
-                Returns the current diff strategy, this value will either be
-                "horizontal" or "vertical".
-
-set_diff_strategy({strategy})                         *vgit.set_diff_strategy()*
-                Diff strategy by VGit to determine how it's going to compare
-                changes to retrieve the hunk. This value can either be "index"
-                or "remote". Setting it to index will only show you changes
-                relative to the current filesystem, where "remote" will
-                compare changes to the remote repository. NOTE When the diff
-                strategy is set to "remote" the base to compare it against
-                will be HEAD.
-
-                Parameters: ~
-                    {strategy} (string):
-                             The strategy that VGit sets and uses to compare
-                             diff against.
-                             Possible values.
-                             • `"index"`: Against changes in the file system.
-                             • `"remote"`: Against changes in remote
-                             repository.
-
-set_diff_base({base})                                     *vgit.set_diff_base()*
-                This is a codependent function on the diff strategy meaning,
-                it will only work if the diff strategy is "remote". Please
-                refer to *set_diff_preference* . Once "remote" is set users
-                can then set the base to any acceptable git commit hash and
-                VGit will compare changes within the project relative to that
-                base.
-
-                Parameters: ~
-                    {base} (string):
-                             Any valid git commit hash.
-
-==============================================================================
-COMMAND                                                   *vgit-diff-base*
-
-                                                                    *:VGit*
-VGit allows you to customize how you want to see the changes in your project.
-Please refer to:
-• *vgit.get_diff_strategy*
-• *vgit.set_diff_strategy*
-• *vgit.set_diff_base*
-• *vgit.get_diff_base*
 
 ==============================================================================
 COMMAND                                                   *vgit-navigation*

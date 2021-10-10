@@ -54,16 +54,6 @@ local detach_blames_autocmd = function(buf)
   autocmd.buf.off(buf, 'InsertEnter')
 end
 
-local get_hunk_calculator = function()
-  return (
-      controller_store.get('diff_strategy') == 'remote' and git.remote_hunks
-    ) or git.index_hunks
-end
-
-local calculate_hunks = function(buf)
-  return get_hunk_calculator()(buffer.store.get(buf, 'tracked_filename'))
-end
-
 local get_current_hunk = function(hunks, lnum)
   for i = 1, #hunks do
     local hunk = hunks[i]
@@ -182,15 +172,7 @@ local generate_tracked_hunk_signs = debounce_trailing(
       buf,
       'tracked_remote_filename'
     )
-    local show_err, original_lines
-    if controller_store.get('diff_strategy') == 'remote' then
-      show_err, original_lines = git.show(
-        tracked_remote_filename,
-        git.get_diff_base()
-      )
-    else
-      show_err, original_lines = git.show(tracked_remote_filename, '')
-    end
+    local show_err, original_lines = git.show(tracked_remote_filename, '')
     scheduler()
     if
       show_err
@@ -274,7 +256,7 @@ local function buf_attach_tracked(buf)
   if not controller_store.get('hunks_enabled') then
     return
   end
-  local err, hunks = calculate_hunks(buf)
+  local err, hunks = git.index_hunks(buffer.store.get(buf, 'tracked_filename'))
   scheduler()
   if err then
     logger.debug(err, debug.traceback())
@@ -364,13 +346,11 @@ M._buf_attach = void(function(buf)
     store_buf(buf, filename, tracked_filename, tracked_remote_filename)
     return buf_attach_tracked(buf)
   end
-  if controller_store.get('diff_strategy') == 'index' then
-    local is_ignored = git.check_ignored(filename)
-    scheduler()
-    if not is_ignored then
-      store_buf(buf, filename, tracked_filename, tracked_remote_filename)
-      buf_attach_untracked(buf)
-    end
+  local is_ignored = git.check_ignored(filename)
+  scheduler()
+  if not is_ignored then
+    store_buf(buf, filename, tracked_filename, tracked_remote_filename)
+    buf_attach_untracked(buf)
   end
 end)
 
@@ -468,8 +448,7 @@ M._rerender_project_diff = void(function()
           }
       end
       local filename = file.filename
-      local hunk_calculator = get_hunk_calculator()
-      local hunks_err, hunks = hunk_calculator(filename)
+      local hunks_err, hunks = git.index_hunks(filename)
       if hunks_err then
         logger.debug(hunks_err, debug.traceback())
         return hunks_err, nil
@@ -515,10 +494,7 @@ M._buf_update = void(function(buf)
   end
   buffer.store.set(buf, 'temp_lines', {})
   if controller_store.get('hunks_enabled') then
-    if
-      buffer.store.get(buf, 'untracked')
-      and controller_store.get('diff_strategy') == 'index'
-    then
+    if buffer.store.get(buf, 'untracked') then
       local hunks = git.untracked_hunks(buffer.get_lines(buf))
       scheduler()
       if not buffer.store.contains(buf) then
@@ -527,19 +503,21 @@ M._buf_update = void(function(buf)
       buffer.store.set(buf, 'hunks', hunks)
       renderer.hide_hunk_signs(buf)
       renderer.render_hunk_signs(buf, hunks)
-      return
+    else
+      local err, hunks = git.index_hunks(
+        buffer.store.get(buf, 'tracked_filename')
+      )
+      scheduler()
+      if err then
+        return logger.debug(err, debug.traceback())
+      end
+      if not buffer.store.contains(buf) then
+        return
+      end
+      buffer.store.set(buf, 'hunks', hunks)
+      renderer.hide_hunk_signs(buf)
+      renderer.render_hunk_signs(buf, hunks)
     end
-    local err, hunks = calculate_hunks(buf)
-    scheduler()
-    if err then
-      return logger.debug(err, debug.traceback())
-    end
-    if not buffer.store.contains(buf) then
-      return
-    end
-    buffer.store.set(buf, 'hunks', hunks)
-    renderer.hide_hunk_signs(buf)
-    renderer.render_hunk_signs(buf, hunks)
   end
 end)
 
@@ -702,17 +680,6 @@ M.buffer_reset = void(function()
       buf,
       'tracked_remote_filename'
     )
-    if controller_store.get('diff_strategy') == 'remote' then
-      local err, lines = git.show(tracked_remote_filename, 'HEAD')
-      scheduler()
-      if not err then
-        logger.debug(err, debug.traceback())
-        return
-      end
-      buffer.set_lines(buf, lines)
-      vim.cmd('update')
-      return
-    end
     local err, lines = git.show(tracked_remote_filename, '')
     scheduler()
     if err then
@@ -737,9 +704,6 @@ M.buffer_hunk_stage = void(function()
     return
   end
   if buffer.is_being_edited(buf) then
-    return
-  end
-  if controller_store.get('diff_strategy') ~= 'index' then
     return
   end
   -- If buffer is untracked then, the whole file is the hunk.
@@ -818,9 +782,6 @@ M.buffer_stage = void(function()
   if buffer.is_being_edited(buf) then
     return
   end
-  if controller_store.get('diff_strategy') ~= 'index' then
-    return
-  end
   local filename = buffer.store.get(buf, 'filename')
   local tracked_filename = buffer.store.get(buf, 'tracked_filename')
   local err = git.stage_file(
@@ -865,9 +826,6 @@ M.buffer_unstage = void(function()
     return
   end
   if buffer.is_being_edited(buf) then
-    return
-  end
-  if controller_store.get('diff_strategy') ~= 'index' then
     return
   end
   if buffer.store.get(buf, 'untracked') then
@@ -1021,7 +979,9 @@ M.toggle_buffer_hunks = void(function()
     end
     buffer.store.for_each(function(buf, bcache)
       if buffer.is_valid(buf) then
-        local hunks_err, hunks = calculate_hunks(buf)
+        local hunks_err, hunks = git.index_hunks(
+          buffer.store.get(buf, 'tracked_filename')
+        )
         scheduler()
         if not hunks_err then
           controller_store.set('hunks_enabled', true)
@@ -1143,89 +1103,6 @@ M.show_debug_logs = function()
   end
 end
 
-M.get_diff_base = function()
-  return git.get_diff_base()
-end
-
-M.get_diff_strategy = function()
-  return controller_store.get('diff_strategy')
-end
-
-M.get_diff_preference = function()
-  return controller_store.get('diff_preference')
-end
-
-M.set_diff_base = void(function(diff_base)
-  scheduler()
-  if not diff_base or type(diff_base) ~= 'string' then
-    logger.error(
-      string.format(
-        'Failed to set diff base, the commit "%s" is invalid',
-        diff_base
-      )
-    )
-    return
-  end
-  if git.controller_store.get('diff_base') == diff_base then
-    return
-  end
-  local is_commit_valid = git.is_commit_valid(diff_base)
-  scheduler()
-  if not is_commit_valid then
-    logger.error(
-      string.format(
-        'Failed to set diff base, the commit "%s" is invalid',
-        diff_base
-      )
-    )
-    return
-  end
-  git.set_diff_base(diff_base)
-  if controller_store.get('diff_strategy') ~= 'remote' then
-    return
-  end
-  local data = buffer.store.get_data()
-  for buf, bcache in pairs(data) do
-    local hunks_err, hunks = git.remote_hunks(bcache.tracked_filename)
-    scheduler()
-    if hunks_err then
-      logger.debug(hunks_err, debug.traceback())
-    else
-      bcache:set('hunks', hunks)
-      renderer.hide_hunk_signs(buf)
-      renderer.render_hunk_signs(buf, hunks)
-    end
-  end
-end)
-
-M.set_diff_strategy = void(function(strategy)
-  scheduler()
-  if strategy ~= 'remote' and strategy ~= 'index' then
-    return logger.error(
-      string.format('Failed to set diff strategy, "%s" is invalid', strategy)
-    )
-  end
-  local current_strategy = controller_store.get('diff_strategy')
-  if current_strategy == strategy then
-    return
-  end
-  controller_store.set('diff_strategy', strategy)
-  buffer.store.for_each(function(buf, bcache)
-    if buffer.is_valid(buf) then
-      local hunks_err, hunks = calculate_hunks(buf)
-      scheduler()
-      if hunks_err then
-        logger.debug(hunks_err, debug.traceback())
-      else
-        controller_store.set('hunks_enabled', true)
-        bcache:set('hunks', hunks)
-        renderer.hide_hunk_signs(buf)
-        renderer.render_hunk_signs(buf, hunks)
-      end
-    end
-  end)
-end)
-
 M.buffer_gutter_blame_preview = void(function()
   local buf = buffer.current()
   if controller_store.get('disabled') then
@@ -1255,8 +1132,7 @@ M.buffer_gutter_blame_preview = void(function()
         logger.debug(blames_err, debug.traceback())
         return blames_err, nil
       end
-      local hunk_calculator = get_hunk_calculator()
-      local hunks_err, hunks = hunk_calculator(filename)
+      local hunks_err, hunks = git.index_hunks(filename)
       scheduler()
       if hunks_err then
         logger.debug(hunks_err, debug.traceback())
@@ -1443,7 +1319,9 @@ M.buffer_diff_preview = void(function()
   renderer.render_diff_preview(
     wrap(function()
       local tracked_filename = buffer.store.get(buf, 'tracked_filename')
-      local hunks_err, hunks = calculate_hunks(buf)
+      local hunks_err, hunks = git.index_hunks(
+        buffer.store.get(buf, 'tracked_filename')
+      )
       scheduler()
       if hunks_err then
         logger.debug(hunks_err, debug.traceback())
@@ -1487,9 +1365,6 @@ M.buffer_staged_diff_preview = void(function()
     return
   end
   if buffer.store.get(buf, 'untracked') then
-    return
-  end
-  if controller_store.get('diff_strategy') ~= 'index' then
     return
   end
   local diff_preference = controller_store.get('diff_preference')
@@ -1556,8 +1431,7 @@ M.project_diff_preview = void(function()
           }
       end
       local filename = file.filename
-      local hunk_calculator = get_hunk_calculator()
-      local hunks_err, hunks = hunk_calculator(filename)
+      local hunks_err, hunks = git.index_hunks(filename)
       if hunks_err then
         logger.debug(hunks_err, debug.traceback())
         return hunks_err, nil
@@ -1609,8 +1483,7 @@ M.project_hunks_qf = void(function()
         logger.debug(show_err, debug.traceback())
       end
     else
-      local hunk_calculator = get_hunk_calculator()
-      hunks_err, hunks = hunk_calculator(filename)
+      hunks_err, hunks = git.index_hunks(filename)
     end
     scheduler()
     if not hunks_err then

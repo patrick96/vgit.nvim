@@ -41,12 +41,6 @@ function VirtualLineNrDecorator:mount()
       self.win_id
     )
   )
-  autocmd.buf.on(
-    self.content_buf,
-    'WinClosed',
-    string.format('renderer.hide_windows({ %s })', self.win_id),
-    { once = true }
-  )
   return self
 end
 

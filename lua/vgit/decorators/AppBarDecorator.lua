@@ -54,12 +54,6 @@ function AppBarDecorator:mount()
   vim.api.nvim_win_set_option(self.win_id, 'cursorbind', false)
   vim.api.nvim_win_set_option(self.win_id, 'scrollbind', false)
   vim.api.nvim_win_set_option(self.win_id, 'winhl', 'Normal:')
-  autocmd.buf.on(
-    self.content_buf,
-    'WinClosed',
-    string.format('renderer.hide_windows({ %s })', self.win_id),
-    { once = true }
-  )
   return self
 end
 

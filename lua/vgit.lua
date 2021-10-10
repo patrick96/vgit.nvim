@@ -1634,64 +1634,6 @@ M.project_hunks_qf = void(function()
   vim.cmd('copen')
 end)
 
-M.actions = function()
-  if not pcall(require, 'telescope') then
-    logger.info(
-      'Please install https://github.com/nvim-telescope/telescope.nvim to use the command palette'
-    )
-    return
-  end
-  local actions = {
-    'project_diff_preview | Opens preview of all the changes in your current project',
-    'project_hunks_qf | Opens quickfix list with all the changes as hunks in your current project',
-    'buffer_diff_preview | Opens preview of the changes in the current buffer',
-    'buffer_staged_diff_preview | Opens preview of all the staged changes for your current buffer',
-    'buffer_hunk_preview | Opens preview of the changes in the current buffer hunk',
-    'buffer_history_preview | Opens preview of all the changes throughout time for the current buffer',
-    'buffer_blame_preview | Opens preview of showing the blame details of the current line for the current buffer',
-    'buffer_gutter_blame_preview | Opens preview of showing all blame details for the current buffer',
-    'buffer_reset | Reset all the changes on the current buffer',
-    'buffer_hunk_stage | Stage the current hunk the cursor is currently on in your current buffer',
-    'buffer_stage | Stage the current buffer',
-    'buffer_unstage | Unstage the current buffer',
-    'buffer_hunk_reset | Reset the current hunk the cursor is onin your current buffer',
-    'toggle_buffer_hunks | Enables buffer signs on/Disables buffer signs off',
-    'toggle_buffer_blames | Enables current line blames/Disables current buffer line blames',
-    'toggle_diff_preference | Toggles between "Horizontal" and "Vertical" diff preference',
-    'hunk_up | Navigates up on to a change on any buffer or preview',
-    'hunk_down | Navigates down on to a change on any buffer or preview',
-    'apply_highlights | Applies all the current highlights, useful when changing colorschemes',
-  }
-  local pickers = require('telescope.pickers')
-  local finders = require('telescope.finders')
-  local conf = require('telescope.config').values
-  local telescope_actions = require('telescope.actions')
-  local action_state = require('telescope.actions.state')
-  pickers.new(
-    { layout_strategy = 'bottom_pane', layout_config = { height = #actions } },
-    {
-      prompt_title = 'VGit',
-      finder = finders.new_table(actions),
-      sorter = conf.generic_sorter(),
-      attach_mappings = function(buf, map)
-        map(
-          'i',
-          '<cr>',
-          void(function()
-            local selected = action_state.get_selected_entry()
-            local value = selected.value
-            local command = vim.trim(vim.split(value, '|')[1])
-            telescope_actions.close(buf)
-            scheduler()
-            require('vgit')[command]()
-          end)
-        )
-        return true
-      end,
-    }
-  ):find()
-end
-
 M.help = function()
   vim.cmd('help vgit.nvim')
 end

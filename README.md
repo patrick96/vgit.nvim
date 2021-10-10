@@ -33,11 +33,6 @@
 - See changes in your project in a quickfix list (`:VGit project_hunks_qf`)
 - Enhance your workflow by using VGit's buffer navigation `:VGit hunk_up` and `:VGit hunk_down` that can be used on any VGit previews with changes.
 
-If you have Telescope feel free to run `:VGit actions` to quickly checkout your execution options.
-<br />
-<br />
-<img src="https://user-images.githubusercontent.com/25164326/135162562-648a3b64-e403-439f-b4fc-6bc7fc7ddcd0.PNG" alt="commands"/>
-
 ## Supported Neovim Versions:
 - Neovim **>=** 0.5
 
@@ -143,7 +138,6 @@ vgit.setup({
     keymaps = {
         ['n <C-k>'] = 'hunk_up',
         ['n <C-j>'] = 'hunk_down',
-        ['n <leader>g'] = 'actions',
         ['n <leader>gs'] = 'buffer_hunk_stage',
         ['n <leader>gr'] = 'buffer_hunk_reset',
         ['n <leader>gp'] = 'buffer_hunk_preview',

@@ -34,13 +34,7 @@ function VirtualLineNrDecorator:mount()
   vim.api.nvim_win_set_option(self.win_id, 'cursorbind', true)
   vim.api.nvim_win_set_option(self.win_id, 'scrollbind', true)
   vim.api.nvim_win_set_option(self.win_id, 'winhl', 'Normal:')
-  self.ns_id = vim.api.nvim_create_namespace(
-    string.format(
-      'tanvirtin/vgit.nvim/virtual_line_nr/%s/%s',
-      self.buf,
-      self.win_id
-    )
-  )
+  self.ns_id = vim.api.nvim_create_namespace('')
   return self
 end
 

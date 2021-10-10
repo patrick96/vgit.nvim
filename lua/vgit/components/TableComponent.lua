@@ -10,19 +10,10 @@ local function shorten_str(str, limit)
   return str
 end
 
-local function make_paddings(
-  rows,
-  column_labels,
-  column_spacing,
-  max_column_len
-)
+local function make_paddings(rows, column_spacing, max_column_len)
   local padding = {}
   for i = 1, #rows do
     local items = rows[i]
-    assert(
-      #column_labels == #items,
-      'number of columns should be the same as number of column_labels'
-    )
     for j = 1, #items do
       local value = shorten_str(items[j], max_column_len)
       if padding[j] then
@@ -76,10 +67,6 @@ end
 local TableComponent = Component:extend()
 
 function TableComponent:new(options)
-  assert(
-    options == nil or type(options) == 'table',
-    'type error :: expected table or nil'
-  )
   options = options or {}
   local height = self:get_min_height()
   local width = self:get_min_width()
@@ -180,13 +167,11 @@ function TableComponent:get_column_ranges()
 end
 
 function TableComponent:set_paddings(paddings)
-  assert(type(paddings) == 'table', 'type error :: expected table')
   self.state.paddings = paddings
   return self
 end
 
 function TableComponent:set_header(header)
-  assert(type(header) == 'table', 'type error :: expected table')
   self.state.header = header
   return self
 end
@@ -195,13 +180,12 @@ function TableComponent:set_lines(lines, force)
   if self:is_static() and self:has_lines() and not force then
     return self
   end
-  assert(type(lines) == 'table', 'type error :: expected table')
   self:increment_paint_count()
   self:clear_timers()
   local header = self.config.header
   local column_spacing = self.config.column_spacing
   local max_column_len = self.config.max_column_len
-  local paddings = make_paddings(lines, header, column_spacing, max_column_len)
+  local paddings = make_paddings(lines, column_spacing, max_column_len)
   local column_header = make_heading(
     paddings,
     header,
@@ -241,11 +225,7 @@ function TableComponent:mount()
     vim.api.nvim_win_set_option(win_id, key, value)
   end
   self:set_win_id(win_id)
-  self:set_ns_id(
-    vim.api.nvim_create_namespace(
-      string.format('tanvirtin/vgit.nvim/%s/%s', buf, win_id)
-    )
-  )
+  self:set_ns_id(vim.api.nvim_create_namespace(''))
   win_ids[#win_ids + 1] = win_id
   self:add_syntax_highlights()
   self:set_mounted(true)

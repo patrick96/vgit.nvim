@@ -1,5 +1,4 @@
 local Object = require('plenary.class')
-local autocmd = require('vgit.autocmd')
 local buffer = require('vgit.buffer')
 local virtual_text = require('vgit.virtual_text')
 local render_store = require('vgit.stores.render_store')
@@ -13,7 +12,7 @@ function AppBarDecorator:new(window_props, content_buf)
     win_id = nil,
     content_buf = content_buf,
     window_props = window_props,
-    ns_id = vim.api.nvim_create_namespace('tanvirtin/vgit.nvim/AppBarDecorator'),
+    ns_id = vim.api.nvim_create_namespace(''),
   }, AppBarDecorator)
 end
 
@@ -74,16 +73,11 @@ function AppBarDecorator:get_lines()
 end
 
 function AppBarDecorator:set_lines(lines)
-  assert(vim.tbl_islist(lines), 'type error :: expected list table')
   buffer.set_lines(self:get_buf(), lines)
   return self
 end
 
 function AppBarDecorator:transpose_text(text, row, col, pos)
-  assert(vim.tbl_islist(text), 'type error :: expected list table')
-  assert(#text == 2, 'invalid number of text entries')
-  assert(type(row) == 'number', 'type error :: expected number')
-  assert(type(col) == 'number', 'type error :: expected number')
   virtual_text.transpose_text(
     self:get_buf(),
     text[1],

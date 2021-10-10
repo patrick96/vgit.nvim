@@ -3,9 +3,9 @@ local render_store = require('vgit.stores.render_store')
 
 local M = {}
 
-M.constants = utils.readonly({
+M.constants = {
   ns_id = 'tanvirtin/vgit.nvim/hunk/signs',
-})
+}
 
 M.state = {
   VGitViewSignAdd = {

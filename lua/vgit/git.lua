@@ -6,10 +6,10 @@ local void = require('plenary.async.async').void
 
 local M = {}
 
-M.constants = utils.readonly({
+M.constants = {
   diff_algorithm = 'myers',
   empty_tree_hash = '4b825dc642cb6eb9a060e54bf8d69288fbee4904',
-})
+}
 
 M.state = {
   diff_base = 'HEAD',

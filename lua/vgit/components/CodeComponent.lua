@@ -8,10 +8,6 @@ local render_store = require('vgit.stores.render_store')
 local CodeComponent = Component:extend()
 
 function CodeComponent:new(options)
-  assert(
-    options == nil or type(options) == 'table',
-    'type error :: expected table or nil'
-  )
   options = options or {}
   local height = self:get_min_height()
   local width = self:get_min_width()
@@ -92,7 +88,6 @@ function CodeComponent:is_header_enabled()
 end
 
 function CodeComponent:set_header(header)
-  assert(type(header) == 'table', 'type error :: expected table')
   self.state.header = header
   return self
 end
@@ -191,11 +186,7 @@ function CodeComponent:mount()
     vim.api.nvim_win_set_option(win_id, key, value)
   end
   self:set_win_id(win_id)
-  self:set_ns_id(
-    vim.api.nvim_create_namespace(
-      string.format('tanvirtin/vgit.nvim/%s/%s', buf, win_id)
-    )
-  )
+  self:set_ns_id(vim.api.nvim_create_namespace(''))
   if self:is_virtual_line_nr_enabled() then
     local virtual_line_nr_config = self.config.virtual_line_nr
     window_props.width = window_props.width + virtual_line_nr_config.width

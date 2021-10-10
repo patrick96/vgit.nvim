@@ -432,12 +432,12 @@ M._rerender_history = void(function(buf)
       end
       local data = calculate_change(lines, hunks)
       return nil,
-        utils.readonly({
+        {
           filename = tracked_filename,
           filetype = buffer.store.get(buf, 'filetype'),
           logs = logs,
           diff_change = data,
-        })
+        }
     end, 0),
     selected_log
   )
@@ -463,9 +463,9 @@ M._rerender_project_diff = void(function()
       local file = changed_files[selected_file]
       if not file then
         return { 'File not found' },
-          utils.readonly({
+          {
             changed_files = changed_files,
-          })
+          }
       end
       local filename = file.filename
       local hunk_calculator = get_hunk_calculator()
@@ -477,19 +477,18 @@ M._rerender_project_diff = void(function()
       local files_err, lines = fs.read_file(filename)
       if files_err then
         logger.debug(files_err, debug.traceback())
-        return files_err,
-          utils.readonly({
-            changed_files = changed_files,
-          })
+        return files_err, {
+          changed_files = changed_files,
+        }
       end
       local data = calculate_change(lines, hunks)
       return nil,
-        utils.readonly({
+        {
           filename = filename,
           filetype = fs.detect_filetype(filename),
           changed_files = changed_files,
           diff_change = data,
-        })
+        }
     end, 0),
     selected_file
   )
@@ -1368,12 +1367,12 @@ M.buffer_history_preview = void(function()
       end
       local data = calculate_change(lines, hunks)
       return nil,
-        utils.readonly({
+        {
           filename = tracked_filename,
           filetype = buffer.store.get(buf, 'filetype'),
           logs = logs,
           diff_change = data,
-        })
+        }
     end, 0),
     buffer.store.get(buf, 'filetype'),
     diff_preference
@@ -1552,9 +1551,9 @@ M.project_diff_preview = void(function()
       local file = changed_files[selected_file]
       if not file then
         return { 'File not found' },
-          utils.readonly({
+          {
             changed_files = changed_files,
-          })
+          }
       end
       local filename = file.filename
       local hunk_calculator = get_hunk_calculator()
@@ -1566,19 +1565,18 @@ M.project_diff_preview = void(function()
       local files_err, lines = fs.read_file(filename)
       if files_err then
         logger.debug(files_err, debug.traceback())
-        return files_err,
-          utils.readonly({
-            changed_files = changed_files,
-          })
+        return files_err, {
+          changed_files = changed_files,
+        }
       end
       local data = calculate_change(lines, hunks)
       return nil,
-        utils.readonly({
+        {
           filename = filename,
           filetype = fs.detect_filetype(filename),
           changed_files = changed_files,
           diff_change = data,
-        })
+        }
     end, 0),
     diff_preference
   )

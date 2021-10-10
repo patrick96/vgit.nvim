@@ -5,7 +5,6 @@ local navigation = require('vgit.navigation')
 local virtual_text = require('vgit.virtual_text')
 local sign = require('vgit.sign')
 local autocmd = require('vgit.autocmd')
-local assert = require('vgit.assertion').assert
 local buffer = require('vgit.buffer')
 local VirtualLineNrDecorator = require('vgit.decorators.VirtualLineNrDecorator')
 local void = require('plenary.async.async').void
@@ -32,10 +31,6 @@ function Component:setup(config)
 end
 
 function Component:new(options)
-  assert(
-    options == nil or type(options) == 'table',
-    'type error :: expected table or nil'
-  )
   options = options or {}
   local height = self:get_min_height()
   local width = self:get_min_width()
@@ -212,49 +207,41 @@ function Component:is_mounted()
 end
 
 function Component:set_virtual_line_nr(virtual_line_nr)
-  assert(type(virtual_line_nr) == 'table', 'type error :: expected table')
   self.state.virtual_line_nr = virtual_line_nr
   return self
 end
 
 function Component:set_ns_id(value)
-  assert(type(value) == 'number', 'type error :: expected number')
   self.state.ns_id = value
   return self
 end
 
 function Component:set_buf(value)
-  assert(type(value) == 'number', 'type error :: expected number')
   self.state.buf = value
   return self
 end
 
 function Component:set_win_id(value)
-  assert(type(value) == 'number', 'type error :: expected number')
   self.state.win_id = value
   return self
 end
 
 function Component:set_cached_lines(value)
-  assert(vim.tbl_islist(value), 'type error :: expected list table')
   self.state.cache.lines = value
   return self
 end
 
 function Component:set_cached_cursor(value)
-  assert(vim.tbl_islist(value), 'type error :: expected list table')
   self.state.cache.cursor = value
   return self
 end
 
 function Component:set_height(value)
-  assert(type(value) == 'number', 'type error :: expected number')
   vim.api.nvim_win_set_height(self:get_win_id(), value)
   return self
 end
 
 function Component:set_width(value)
-  assert(type(value) == 'number', 'type error :: expected number')
   vim.api.nvim_win_set_width(self:get_win_id(), value)
   return self
 end
@@ -309,7 +296,6 @@ function Component:increment_paint_count()
 end
 
 function Component:set_filetype(filetype)
-  assert(type(filetype) == 'string', 'type error :: expected string')
   self.config.filetype = filetype
   local buf = self:get_buf()
   self:clear_syntax_highlights()
@@ -319,8 +305,6 @@ function Component:set_filetype(filetype)
 end
 
 function Component:set_cursor(row, col)
-  assert(type(row) == 'number', 'type error :: expected number')
-  assert(type(col) == 'number', 'type error :: expected number')
   navigation.set_cursor(self:get_win_id(), { row, col })
   if self:has_virtual_line_nr() then
     navigation.set_cursor(self:get_virtual_line_nr_win_id(), { row, col })
@@ -342,7 +326,6 @@ function Component:set_lines(lines, force)
   if self:is_static() and self:has_lines() and not force then
     return self
   end
-  assert(type(lines) == 'table', 'type error :: expected table')
   self:increment_paint_count()
   self:clear_timers()
   buffer.set_lines(self:get_buf(), lines)
@@ -350,12 +333,6 @@ function Component:set_lines(lines, force)
 end
 
 function Component:set_virtual_line_nr_lines(lines, hls)
-  assert(type(lines) == 'table', 'type error :: expected table')
-  assert(
-    self:has_virtual_line_nr(),
-    'cannot set virtual number lines -- virtual number is disabled'
-  )
-  assert(self:get_virtual_line_nr(), 'VirtualLineNrDecorator not created')
   local virtual_line_nr = self:get_virtual_line_nr()
   virtual_line_nr:unmount()
   self:set_virtual_line_nr(
@@ -378,8 +355,6 @@ function Component:set_centered_animated_text(
   force,
   callback
 )
-  assert(type(frame_rate) == 'number', 'type error :: expected number')
-  assert(vim.tbl_islist(frames), 'type error :: expected list table')
   self:clear_timers()
   self:set_centered_text(frames[1], true, force)
   local frame_count = 1
@@ -413,7 +388,6 @@ function Component:set_loading(value, force)
   if self:is_static() and self:has_lines() and not force then
     return self
   end
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   self:clear_timers()
   if value == self:get_loading() then
     return self
@@ -443,7 +417,6 @@ function Component:set_error(value, force)
   if self:is_static() and self:has_lines() and not force then
     return self
   end
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   self:clear_timers()
   if value == self:get_error() then
     return self
@@ -465,7 +438,6 @@ function Component:set_centered_text(text, in_animation, force)
   if self:is_static() and self:has_lines() and not force then
     return self
   end
-  assert(type(text) == 'string', 'type error :: expected string')
   if not in_animation then
     self:clear_timers()
   end
@@ -491,7 +463,6 @@ function Component:set_centered_text(text, in_animation, force)
 end
 
 function Component:set_mounted(value)
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   self.state.mounted = value
   return self
 end
@@ -512,10 +483,6 @@ function Component:remove_keymap(key)
 end
 
 function Component:transpose_text(text, row, col)
-  assert(vim.tbl_islist(text), 'type error :: expected list table')
-  assert(#text == 2, 'invalid number of text entries')
-  assert(type(row) == 'number', 'type error :: expected number')
-  assert(type(col) == 'number', 'type error :: expected number')
   virtual_text.transpose_text(
     self:get_buf(),
     text[1],
@@ -527,13 +494,10 @@ function Component:transpose_text(text, row, col)
 end
 
 function Component:transpose_line(texts, row)
-  assert(vim.tbl_islist(texts), 'type error :: expected list table')
-  assert(type(row) == 'number', 'type error :: expected number')
   virtual_text.transpose_line(self:get_buf(), texts, self:get_ns_id(), row)
 end
 
 function Component:call(fn)
-  assert(type(fn) == 'function', 'type error :: expected function')
   vim.api.nvim_buf_call(self:get_buf(), fn)
   return self
 end

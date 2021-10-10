@@ -4,7 +4,6 @@ local autocmd = require('vgit.autocmd')
 local logger = require('vgit.logger')
 local sign = require('vgit.sign')
 local virtual_text = require('vgit.virtual_text')
-local assert = require('vgit.assertion').assert
 local buffer = require('vgit.buffer')
 local scheduler = require('plenary.async.util').scheduler
 local navigation = require('vgit.navigation')
@@ -13,11 +12,6 @@ local CodeComponent = require('vgit.components.CodeComponent')
 local Preview = Object:extend()
 
 function Preview:new(components, opts)
-  assert(type(components) == 'table', 'type error :: expected table')
-  assert(
-    type(opts) == 'table' or type(opts) == 'nil',
-    'type error :: expected string or nil'
-  )
   opts = opts or {}
   return setmetatable({
     components = components,
@@ -86,7 +80,7 @@ function Preview:highlight_diff_change(data)
   local lnum_changes = data.lnum_changes
   local layout_type = self.layout_type or 'horizontal'
   local components = self:get_components()
-  local ns_id = vim.api.nvim_create_namespace('tanvirtin/vgit.nvim/paint')
+  local ns_id = vim.api.nvim_create_namespace('')
   scheduler()
   for i = 1, #lnum_changes do
     scheduler()
@@ -327,12 +321,10 @@ function Preview:make_virtual_line_nr(data)
 end
 
 function Preview:set_mounted(value)
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   self.state.mounted = value
 end
 
 function Preview:set_loading(value, force)
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   if not self:is_mounted() then
     return self
   end
@@ -343,7 +335,6 @@ function Preview:set_loading(value, force)
 end
 
 function Preview:set_centered_text(text, force)
-  assert(type(text) == 'string', 'type error :: expected string')
   for _, component in pairs(self.components) do
     component:set_centered_text(text, force)
   end
@@ -351,7 +342,6 @@ function Preview:set_centered_text(text, force)
 end
 
 function Preview:set_error(value, force)
-  assert(type(value) == 'boolean', 'type error :: expected boolean')
   for _, component in pairs(self.components) do
     component:set_error(value, force)
   end

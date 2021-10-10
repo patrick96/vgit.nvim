@@ -1,11 +1,9 @@
 local buffer = require('vgit.buffer')
-local assert = require('vgit.assertion').assert
 local pfiletype = require('plenary.filetype')
 
 local M = {}
 
 M.cwd_filename = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   local end_index = nil
   for i = #filepath, 1, -1 do
     local letter = filepath:sub(i, i)
@@ -20,7 +18,6 @@ M.cwd_filename = function(filepath)
 end
 
 M.relative_filename = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   local cwd = vim.loop.cwd()
   if not cwd or not filepath then
     return filepath
@@ -36,7 +33,6 @@ M.relative_filename = function(filepath)
 end
 
 M.short_filename = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   local filename = ''
   for i = #filepath, 1, -1 do
     local letter = filepath:sub(i, i)
@@ -49,13 +45,11 @@ M.short_filename = function(filepath)
 end
 
 M.filename = function(buf)
-  assert(type(buf) == 'number', 'type error :: expected number')
   local filepath = vim.api.nvim_buf_get_name(buf)
   return M.relative_filename(filepath)
 end
 
 M.filetype = function(buf)
-  assert(type(buf) == 'number', 'type error :: expected number')
   return buffer.get_option(buf, 'filetype')
 end
 
@@ -71,7 +65,6 @@ M.tmpname = function()
 end
 
 M.read_file = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   local fd = vim.loop.fs_open(filepath, 'r', 438)
   if fd == nil then
     return { 'File not found' }, nil
@@ -88,8 +81,6 @@ M.read_file = function(filepath)
 end
 
 M.write_file = function(filepath, lines)
-  assert(type(filepath) == 'string', 'type error :: expected string')
-  assert(vim.tbl_islist(lines), 'type error :: expected list table')
   local f = io.open(filepath, 'wb')
   for i = 1, #lines do
     local l = lines[i]
@@ -100,12 +91,10 @@ M.write_file = function(filepath, lines)
 end
 
 M.remove_file = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   return os.remove(filepath)
 end
 
 M.exists = function(filepath)
-  assert(type(filepath) == 'string', 'type error :: expected string')
   return (vim.loop.fs_stat(filepath) and true) or false
 end
 

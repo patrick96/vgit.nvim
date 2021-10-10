@@ -9,7 +9,6 @@ M.get = function()
 end
 
 M.set = function(component)
-  assert(type(component) == 'table', 'type error :: expected table')
   M.state.current = component
 end
 

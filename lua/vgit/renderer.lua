@@ -17,13 +17,11 @@ local M = {}
 
 local current_hunk_mark_timer_id = nil
 
-M.constants = utils.readonly({
-  blame_ns_id = vim.api.nvim_create_namespace('tanvirtin/vgit.nvim/blame'),
-  current_hunk_mark_ns_id = vim.api.nvim_create_namespace(
-    'tanvirtin/vgit.nvim/current_hunk_mark_ns_id'
-  ),
+M.constants = {
+  blame_ns_id = vim.api.nvim_create_namespace(''),
+  current_hunk_mark_ns_id = vim.api.nvim_create_namespace(''),
   blame_line_id = 1,
-})
+}
 
 M.render_current_hunk_mark = function(buf, selected, num_hunks)
   M.hide_current_hunk_mark(buf)

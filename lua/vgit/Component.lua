@@ -27,7 +27,7 @@ Component.state = {
 }
 
 function Component:setup(config)
-  vim.tbl_deep_extend('force', Component.state, config)
+  Component.state = vim.tbl_deep_extend('force', Component.state, config)
 end
 
 function Component:new(options)

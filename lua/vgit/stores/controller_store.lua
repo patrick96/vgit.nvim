@@ -16,7 +16,11 @@ M.state = {
 }
 
 M.setup = function(config)
-  vim.tbl_deep_extend('force', M.state, config and config.controller or {})
+  M.state = vim.tbl_deep_extend(
+    'force',
+    M.state,
+    config and config.controller or {}
+  )
 end
 
 M.get = function(key)

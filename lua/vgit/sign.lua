@@ -1,4 +1,3 @@
-local utils = require('vgit.utils')
 local render_store = require('vgit.stores.render_store')
 
 local M = {}
@@ -51,7 +50,11 @@ M.state = {
 }
 
 M.setup = function(config)
-  vim.tbl_deep_extend('force', M.state, (config and config.signs) or {})
+  M.state = vim.tbl_deep_extend(
+    'force',
+    M.state,
+    (config and config.signs) or {}
+  )
   for _, action in pairs(M.state) do
     M.define(action)
   end

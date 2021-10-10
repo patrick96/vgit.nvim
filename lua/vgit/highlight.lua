@@ -23,7 +23,7 @@ M.create_theme = function(hls)
 end
 
 M.setup = function(config, force)
-  vim.tbl_deep_extend('force', M.state, config and config.hls or {})
+  M.state = vim.tbl_deep_extend('force', M.state, config and config.hls or {})
   for hl, color in pairs(M.state) do
     if force or not M.exists(hl) then
       M.create(hl, color)

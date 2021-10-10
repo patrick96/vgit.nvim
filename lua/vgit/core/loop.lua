@@ -1,5 +1,3 @@
-local Object = require('vgit.core.Object')
-
 local uv = vim.loop
 
 --[[
@@ -7,9 +5,9 @@ local uv = vim.loop
         One stop shop for all things asynchronous.
 --]]
 
-local Loop = Object:extend()
+local loop = {}
 
-function Loop:throttle(fn, ms)
+function loop.throttle(fn, ms)
   local timer = vim.loop.new_timer()
   local running = false
   return function(...)
@@ -24,7 +22,7 @@ function Loop:throttle(fn, ms)
   end
 end
 
-function Loop:debounce(fn, ms)
+function loop.debounce(fn, ms)
   local timer = vim.loop.new_timer()
   return function(...)
     local argv = { ... }
@@ -35,12 +33,12 @@ function Loop:debounce(fn, ms)
   end
 end
 
-function Loop:watch(filename, callback)
+function loop.watch(filename, callback)
   local watcher = uv.new_fs_event()
   local function on_change()
     callback(filename)
     watcher:stop()
-    Loop:watch(filename, callback)
+    loop.watch(filename, callback)
   end
   local fullpath = vim.api.nvim_call_function('fnamemodify', { filename, ':p' })
   watcher:start(
@@ -52,4 +50,4 @@ function Loop:watch(filename, callback)
   )
 end
 
-return Loop
+return loop

@@ -1,8 +1,8 @@
-local Loop = require('vgit.core.Loop')
+local loop = require('vgit.core.loop')
 
 local eq = assert.are.same
 
-describe('Loop', function()
+describe('loop', function()
   describe('throttle', function()
     local closure_creator = function(initial_value)
       local counter = initial_value
@@ -17,7 +17,7 @@ describe('Loop', function()
       function()
         local result = nil
         local closure = closure_creator(1)
-        local throttled_fn = Loop:throttle(function()
+        local throttled_fn = loop.throttle(function()
           result = closure()
           eq(result, 2)
         end, 100)
@@ -30,7 +30,7 @@ describe('Loop', function()
     it(
       'should throw errors if an error occurs within the wrapped function',
       function()
-        local throttled_fn = Loop:throttle(function()
+        local throttled_fn = loop.throttle(function()
           assert(false, 'an error has occured')
         end, 100)
         assert.has_error(function()
@@ -56,7 +56,7 @@ describe('Loop', function()
       function()
         local result = nil
         local closure = closure_creator(1)
-        local debounced_fn = Loop:debounce(function()
+        local debounced_fn = loop.debounce(function()
           result = closure()
           eq(result, 1)
         end, 100)

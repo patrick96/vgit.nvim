@@ -1,34 +1,33 @@
-local Env = require('vgit.core.Env')
-local Object = require('vgit.core.Object')
+local env = require('vgit.core.env')
 
 local state = {
   logs = {},
 }
 
-local Logger = Object:extend()
+local logger = {}
 
-function Logger:error(msg)
+function logger.error(msg)
   vim.notify(msg, 'error')
-  return Logger
+  return logger
 end
 
-function Logger:info(msg)
+function logger.info(msg)
   vim.notify(msg, 'info')
-  return Logger
+  return logger
 end
 
-function Logger:warn(msg)
+function logger.warn(msg)
   vim.notify(msg, 'warn')
-  return Logger
+  return logger
 end
 
-function Logger:get_logs()
+function logger.get_logs()
   return state.logs
 end
 
-function Logger:debug(msg, trace)
-  if not Env:get('DEBUG') then
-    return Logger
+function logger.debug(msg, trace)
+  if not env.get('DEBUG') then
+    return logger
   end
   local new_msg = ''
   if vim.tbl_islist(msg) then
@@ -51,7 +50,7 @@ function Logger:debug(msg, trace)
     log = string.format('VGit[%s]: %s', os.date('%H:%M:%S'), new_msg)
   end
   logs[#logs + 1] = log
-  return Logger
+  return logger
 end
 
-return Logger
+return logger

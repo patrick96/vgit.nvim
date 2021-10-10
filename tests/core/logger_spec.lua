@@ -1,12 +1,12 @@
-local Logger = require('vgit.core.Logger')
-local Env = require('vgit.core.Env')
+local logger = require('vgit.core.logger')
+local env = require('vgit.core.env')
 local mock = require('luassert.mock')
 
 local eq = assert.are.same
 
-Env:set('DEBUG', true)
+env.set('DEBUG', true)
 
-describe('Logger', function()
+describe('logger', function()
   describe('info', function()
     before_each(function()
       vim.notify = mock(vim.notify, true)
@@ -18,7 +18,7 @@ describe('Logger', function()
     end)
 
     it('should call notify passing in the appropriate arguments', function()
-      Logger:info('hello')
+      logger.info('hello')
       assert.stub(vim.notify).was_called_with('hello', 'info')
     end)
   end)
@@ -34,7 +34,7 @@ describe('Logger', function()
     end)
 
     it('should call notify passing in the appropriate arguments', function()
-      Logger:warn('hello')
+      logger.warn('hello')
       assert.stub(vim.notify).was_called_with('hello', 'warn')
     end)
   end)
@@ -50,7 +50,7 @@ describe('Logger', function()
     end)
 
     it('should call notify passing in the appropriate arguments', function()
-      Logger:error('hello')
+      logger.error('hello')
       assert.stub(vim.notify).was_called_with('hello', 'error')
     end)
   end)
@@ -59,14 +59,14 @@ describe('Logger', function()
     it('should populate the logs when the debug flag is set to true', function()
       local count = 30
       for _ = 1, count do
-        Logger:debug('stuff', debug.traceback())
+        logger.debug('stuff', debug.traceback())
       end
-      eq(#Logger:get_logs(), count)
-      Env:set('DEBUG', false)
+      eq(#logger.get_logs(), count)
+      env.set('DEBUG', false)
       for _ = 1, count do
-        Logger:debug('stuff', debug.traceback())
+        logger.debug('stuff', debug.traceback())
       end
-      eq(#Logger:get_logs(), count)
+      eq(#logger.get_logs(), count)
     end)
   end)
 end)

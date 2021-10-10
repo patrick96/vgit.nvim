@@ -13,10 +13,6 @@ function Window:new(win_id)
   }, Window)
 end
 
-function Window:get_win_id()
-  return self.win_id
-end
-
 function Window:open(buffer, opts)
   opts = opts or {}
   local focus = opts.focus
@@ -24,7 +20,7 @@ function Window:open(buffer, opts)
     opts.focus = nil
   end
   self.win_id = vim.api.nvim_open_win(
-    buffer:get_bufnr(),
+    buffer.bufnr,
     focus ~= nil and focus or false,
     opts
   )

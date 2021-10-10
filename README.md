@@ -130,7 +130,9 @@ local vgit = require('vgit')
 local utils = require('vgit.utils')
 
 vgit.setup({
-    debug = false, -- Only enable this to trace issues related to the app,
+    logger = {
+        debug = false, -- Only enable this to trace issues related to the app,
+    },
     keymaps = {
         ['n <C-k>'] = 'hunk_up',
         ['n <C-j>'] = 'hunk_down',

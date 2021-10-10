@@ -26,7 +26,9 @@ configuration:
     local utils = require('vgit.utils')
 
     vgit.setup({
-        debug = false,
+        logger = {
+          debug = false,
+        },
         keymaps = {
             ['n <C-k>'] = 'hunk_up',
             ['n <C-j>'] = 'hunk_down',

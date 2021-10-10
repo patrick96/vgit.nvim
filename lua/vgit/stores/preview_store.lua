@@ -17,10 +17,7 @@ M.exists = function()
 end
 
 M.clear = function()
-  if M.exists() then
-    M.get():unmount()
-    M.state.current = {}
-  end
+  M.state.current = {}
 end
 
 return M

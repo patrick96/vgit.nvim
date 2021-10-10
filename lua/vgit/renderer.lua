@@ -1,4 +1,3 @@
-local utils = require('vgit.utils')
 local render_store = require('vgit.stores.render_store')
 local DiffPreview = require('vgit.previews.DiffPreview')
 local GutterBlamePreview = require('vgit.previews.GutterBlamePreview')
@@ -90,7 +89,7 @@ M.render_hunk_signs = function(buf, hunks)
 end
 
 M.render_blame_preview = function(fetch)
-  preview_store.clear()
+  M.hide_preview()
   local blame_preview = BlamePreview:new()
   preview_store.set(blame_preview)
   blame_preview:mount()
@@ -107,7 +106,7 @@ M.render_blame_preview = function(fetch)
 end
 
 M.render_gutter_blame_preview = function(fetch, filetype)
-  preview_store.clear()
+  M.hide_preview()
   local gutter_blame_preview = GutterBlamePreview:new({ filetype = filetype })
   preview_store.set(gutter_blame_preview)
   gutter_blame_preview:mount()
@@ -124,7 +123,7 @@ M.render_gutter_blame_preview = function(fetch, filetype)
 end
 
 M.render_hunk_preview = function(fetch, filetype)
-  preview_store.clear()
+  M.hide_preview()
   local current_lnum = vim.api.nvim_win_get_cursor(0)[1]
   local hunk_preview = HunkPreview:new({ filetype = filetype })
   preview_store.set(hunk_preview)
@@ -143,7 +142,7 @@ M.render_hunk_preview = function(fetch, filetype)
 end
 
 M.render_diff_preview = function(fetch, filetype, layout_type)
-  preview_store.clear()
+  M.hide_preview()
   local current_lnum = vim.api.nvim_win_get_cursor(0)[1]
   local diff_preview = DiffPreview:new({
     filetype = filetype,
@@ -166,7 +165,7 @@ M.render_diff_preview = function(fetch, filetype, layout_type)
 end
 
 M.render_history_preview = function(fetch, filetype, layout_type)
-  preview_store.clear()
+  M.hide_preview()
   local history_preview = HistoryPreview:new({
     filetype = filetype,
     layout_type = layout_type,
@@ -208,7 +207,7 @@ M.rerender_history_preview = function(fetch, selected)
 end
 
 M.render_project_diff_preview = function(fetch, layout_type)
-  preview_store.clear()
+  M.hide_preview()
   local project_diff_preview = ProjectDiffPreview:new({
     layout_type = layout_type,
     selected = 0,
@@ -298,18 +297,14 @@ M.hide_hunk_signs = function(buf)
 end
 
 M.hide_preview = function()
-  local preview = preview_store.get()
-  if not vim.tbl_isempty(preview) then
-    preview:unmount()
-    preview_store.set({})
+  if preview_store.exists() then
+    preview_store.get():unmount()
+    preview_store.clear()
   end
 end
 
 M.hide_windows = function(wins)
-  local preview = preview_store.get()
-  if not vim.tbl_isempty(preview) then
-    preview_store.clear()
-  end
+  M.hide_preview()
   local existing_wins = vim.api.nvim_list_wins()
   for i = 1, #wins do
     local win = wins[i]

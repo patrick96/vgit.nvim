@@ -1,10 +1,5 @@
 local err = require('vgit.core.err')
 
---[[
-    Responsibility:
-        Global store for values for the core.
---]]
-
 local state = {}
 
 local env = {}

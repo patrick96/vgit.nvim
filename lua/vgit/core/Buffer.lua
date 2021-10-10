@@ -1,10 +1,5 @@
 local Object = require('vgit.core.Object')
 
---[[
-    Responsibility:
-        Central source of all metadata associated with a nvim buffer.
---]]
-
 local Buffer = Object:extend()
 
 function Buffer:new(bufnr)

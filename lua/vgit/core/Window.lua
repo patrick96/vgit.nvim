@@ -1,10 +1,5 @@
 local Object = require('vgit.core.Object')
 
---[[
-    Responsibility:
-        Central source of all metadata associated with a nvim window.
---]]
-
 local Window = Object:extend()
 
 function Window:new(win_id)

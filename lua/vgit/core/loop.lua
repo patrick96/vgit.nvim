@@ -1,10 +1,5 @@
 local uv = vim.loop
 
---[[
-    Responsibility:
-        One stop shop for all things asynchronous.
---]]
-
 local loop = {}
 
 function loop.throttle(fn, ms)
